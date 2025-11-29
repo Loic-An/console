@@ -1,0 +1,4 @@
+[project]
+name = "console"
+type = "executable"
+install_headers = false

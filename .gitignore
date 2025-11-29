@@ -39,3 +39,13 @@
 
 # debug information files
 *.dwo
+
+# vscode
+.vscode/
+
+# cpm
+build/
+lib/
+compile_commands.json
+.config/
+conanfile.txt
