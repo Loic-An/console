@@ -1,5 +1,5 @@
 #include "console.hpp"
-#include <csignal>
+#include "Drawable.hpp"
 
 static volatile sig_atomic_t g_notKilled = 1;
 void sig_handler(int sig)
@@ -15,11 +15,12 @@ Console::~Console()
 
 Size Console::getSize()
 {
+
     if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &this->size) == -1)
     {
         perror("ioctl");
     }
-    return {this->size.ws_col, this->size.ws_row};
+    return {this->size.ws_row, this->size.ws_col};
 }
 
 void Console::moveCursorUp(const int &n = 1)
@@ -66,9 +67,14 @@ void Console::cursorPos(const int &row = 1, const int &col = 1)
         this->interface << "\033[" << row << ";" << col << "H";
 }
 
+void Console::write(const Drawable &object)
+{
+    object.draw(this);
+}
+
 void Console::write(const Size &data)
 {
-    this->interface << "Size<col=" << data.col << ";row=" << data.row << ">";
+    this->interface << "Size<row=" << data.getRow() << ";col=" << data.getCol() << ">";
 }
 template <typename OStreamWritable>
 inline void Console::write(const OStreamWritable &data)
@@ -84,15 +90,15 @@ int Console::mainLoop()
             fun(this);
         this->interface << std::flush;
     }
-    std::cout << "mainloopend";
+    this->interface << "mainloopend";
     return 0;
 }
 
-Console::Console(std::ostream &interface = std::cout, const bool nosetup = false) : interface(interface)
+Console::Console(std::ostream &interface = std::cout, const bool nosetup = false) : interface(interface), pos(1, 1)
 {
     // Constructor implementation
     // Bind internal streambuf to the provided stream to avoid assigning std::ostream (assignment is deleted)
-    this->getSize(); // feed size struct with initial data
+    (void)this->getSize(); // feed size struct with initial data
     if (nosetup)
         return;
     // interface.rdbuf()->pubsetbuf(0, 0); // no buffer

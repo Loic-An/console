@@ -1,17 +1,14 @@
+#pragma once
 #if defined(__CYGWIN__) || defined(__unix__) || defined(__APPLE__)
 // POSIX-like platforms (Cygwin, Unix, macOS)
 #include <csignal>
-#include <sys/ioctl.h>
 #include <unistd.h>
 #include <iostream>
 #include <vector>
+#include "Coord.hpp"
 
-struct Size
-{
-    int col;
-    int row;
-};
-
+typedef Coord Size;
+class Drawable;
 enum Color
 {
     BLACK = 30,
@@ -28,7 +25,7 @@ class Console
 {
 private:
     winsize size;
-    Size pos;
+    Coord pos;
     std::ostream &interface;
     std::vector<void (*)(Console *)> funvector;
 
@@ -45,6 +42,7 @@ public:
     void clearEnd();
     void clearScreen();
     void cursorPos(const int &row, const int &col);
+    void write(const Drawable &object);
     void write(const Size &data);
     template <typename OStreamWritable>
     void write(const OStreamWritable &data);
